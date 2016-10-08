@@ -28,7 +28,11 @@ void setup() {
 
 
   void loop() {
+    int x;
+    int y;
+    x = y = input();
     drive();//continuously drive motor
+
     Serial.println(i);
   }
   void drive(int x, int y)//sends control signal to motor shield
@@ -37,9 +41,7 @@ void setup() {
     int speed1;//speed right motor
     int direction0 = CW; //direction left motor
     int direction1 = CW; //direction right motor
-    calcultateSpeedDirection (x, y);//calculate parameters
-    speed0 = map(velocityLeft, 0, controllerMax, 0, 255);
-    speed1 = map(velocityRight, 0, controllerMax, 0, 255);
+    calcultateSpeedDirection (x, y, &speed0, &speed1, &direction0, &direction1); //calculate parameters
     adjustMotor(0, direction0, speed0);//run left motor
     adjustMotor (1, direction1, speed1);//run right motor
   }
@@ -55,16 +57,18 @@ void setup() {
       digitalWrite(inBpin[motor], LOW);
     analogWrite(pwmpin[motor], pwm);
   }
-  void calcultateSpeedDirection (x, y)//converts input in controller-format to suitable combination of track movements
+  void calcultateSpeedDirection (int x, int y, int *vL, int *vR, int *dL, int *dR) //converts input in controller-format to suitable combination of track movements
   {
-    int velocityLeft = (x / 2) + y;//compute velociy left track
-    if (velocityLeft < 0)// if needed change left direction
+    *vL = (x / 2) + y;//compute velociy left track
+    if (*vL < 0)// if needed change left direction
     {
-      directionLeft = CCW;
+      *dL = CCW;
     }
-    int velocityRight = ((-x) / 2) + y;//see Left
-    if (velocityRight < 0)
+    *vR = ((-x) / 2) + y;//see Left
+    if (*vR < 0)
     {
-      directionRight = CCW;//see Left
+      *dR = CCW;//see Left
     }
+    *vL = map(*vL, 0, controllerMax, 0, 255);
+    *vR = map(*vR, 0, controllerMax, 0, 255);
   }
