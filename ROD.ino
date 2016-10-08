@@ -29,6 +29,7 @@ void setup() {
 
   void loop() {
     drive();//continuously drive motor
+    Serial.println(i);
   }
   void drive(int x, int y)//sends control signal to motor shield
   {
@@ -42,9 +43,17 @@ void setup() {
     adjustMotor(0, direction0, speed0);//run left motor
     adjustMotor (1, direction1, speed1);//run right motor
   }
-  void adjustMotor(uint8_t motor, uint8_t direct, uint8_t pwm)//sends signal to run motor
+  void adjustMotor(int motor, int direct, int pwm)//sends signal to run motor
   {
-
+    if (direct = CW)
+      digitalWrite(inApin[motor], HIGH);
+    else
+      digitalWrite(inApin[motor], LOW);
+    if (direct = CCW)
+      digitalWrite(inBpin[motor], HIGH);
+    else
+      digitalWrite(inBpin[motor], LOW);
+    analogWrite(pwmpin[motor], pwm);
   }
   void calcultateSpeedDirection (x, y)//converts input in controller-format to suitable combination of track movements
   {
