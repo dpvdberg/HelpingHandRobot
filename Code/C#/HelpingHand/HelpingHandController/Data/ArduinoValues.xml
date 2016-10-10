@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArduinoDefaultValues>
+  <ArduinoValue name="GimbalXaxis">90</ArduinoValue>
+  <ArduinoValue name="GimbalYaxis">90</ArduinoValue>
+</ArduinoDefaultValues>
