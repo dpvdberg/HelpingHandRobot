@@ -14,7 +14,7 @@ namespace HelpingHandController
     class ArduinoController
     {
         Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        Dictionary<string, int> valueHolder = new Dictionary<string, int>();
+        Dictionary<int, int> valueHolder = new Dictionary<int, int>();
 
 
         public ArduinoController()
@@ -26,13 +26,13 @@ namespace HelpingHandController
 
         public enum ArduinoValues
         {
-            [StringValue("GXA")] GimbalXaxis,
-            [StringValue("GYA")] GimbalYaxis,
+            RightXaxis = 0,
+            RightYaxis = 1,
         }
 
         public void UpdateValue(ArduinoValues argument, int value)
         {
-            valueHolder[StringEnum.GetStringValue(argument)] = value;
+            valueHolder[(int)argument] = value;
         }
 
         private void SetInitialValues()
@@ -44,20 +44,21 @@ namespace HelpingHandController
             foreach (XElement element in elements)
             {
                 valueHolder.Add(
-                    StringEnum.GetStringValue(
-                        (ArduinoValues) Enum.Parse(typeof(ArduinoValues), (string) element.Attribute("name"))),
+                    (int) (ArduinoValues) Enum.Parse(typeof(ArduinoValues), (string) element.Attribute("name")),
                     int.Parse(element.Value));
             }
         }
 
-
-        public int GetDataString()
+        /// <summary>
+        /// Encodes data to readable format for arduino
+        /// </summary>
+        /// <returns></returns>
+        public string GetDataString()
         {
-            return valueHolder["GXA"];
             string data = "";
-            foreach (KeyValuePair<string, int> v in valueHolder)
-                data += $"{v.Key}:{v.Value}|";
-            //return data;
+            foreach (KeyValuePair<int, int> v in valueHolder)
+                data += $"{v.Key}:{v.Value}&";
+            return data.Trim('&');
         }
 
         public void SendData(bool addNewLine = true)

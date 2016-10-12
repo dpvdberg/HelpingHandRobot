@@ -24,16 +24,21 @@ void setup() {
     digitalWrite(inApin[i], LOW);
     digitalWrite(inBpin[i], LOW);
   }
+}
 
 
 
   void loop() {
     int x;
     int y;
-    x = y = input();
-    drive();//continuously drive motor
+    x = 4000;
+    y = 4000;
 
-    Serial.println(i);
+    adjustMotor(0, 0, 200);//run left motor
+    adjustMotor(1, 0, 200);//run right motor
+    
+    delay(500);
+    //drive(x,y);//continuously drive motor
   }
   void drive(int x, int y)//sends control signal to motor shield
   {
@@ -41,20 +46,21 @@ void setup() {
     int speed1;//speed right motor
     int direction0 = CW; //direction left motor
     int direction1 = CW; //direction right motor
-    calcultateSpeedDirection (x, y, &speed0, &speed1, &direction0, &direction1); //calculate parameters
-    adjustMotor(0, direction0, speed0);//run left motor
-    adjustMotor (1, direction1, speed1);//run right motor
+    //calcultateSpeedDirection (x, y, &speed0, &speed1, &direction0, &direction1); //calculate parameters
+    adjustMotor(0, 0, 200);//run left motor
+    adjustMotor(1, 0, 200);//run right motor
   }
   void adjustMotor(int motor, int direct, int pwm)//sends signal to run motor
   {
-    if (direct = CW)
-      digitalWrite(inApin[motor], HIGH);
-    else
+    //if (direct = CW)
+    digitalWrite(inApin[motor], HIGH);
+    /*else
       digitalWrite(inApin[motor], LOW);
+      
     if (direct = CCW)
       digitalWrite(inBpin[motor], HIGH);
-    else
-      digitalWrite(inBpin[motor], LOW);
+    else*/
+    digitalWrite(inBpin[motor], LOW);
     analogWrite(pwmpin[motor], pwm);
   }
   void calcultateSpeedDirection (int x, int y, int *vL, int *vR, int *dL, int *dR) //converts input in controller-format to suitable combination of track movements
@@ -69,6 +75,6 @@ void setup() {
     {
       *dR = CCW;//see Left
     }
-    *vL = map(*vL, 0, controllerMax, 0, 255);
-    *vR = map(*vR, 0, controllerMax, 0, 255);
+    *vL = map(*vL, 0, 8000, 0, 255);
+    *vR = map(*vR, 0, 8000, 0, 255);
   }

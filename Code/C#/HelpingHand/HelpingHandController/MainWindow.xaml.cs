@@ -35,7 +35,7 @@ namespace HelpingHandController
             _selectedController.StateChanged += _selectedController_StateChanged;
             XboxController.StartPolling();
             timer = new Timer();
-            timer.Interval = 10;
+            timer.Interval = 20;
             timer.Elapsed += timer_Elapsed;
             timer.Start(); 
         }
@@ -118,13 +118,13 @@ namespace HelpingHandController
 
         private void RightXAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalXaxis, MapAxisToServo(_selectedController.RightThumbStick.X));
+            controller.UpdateValue(ArduinoController.ArduinoValues.RightXaxis, MapAxisToServo(_selectedController.RightThumbStick.X));
             //controller.SendData();
         }
 
         private void RightYAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalYaxis, MapAxisToServo(_selectedController.RightThumbStick.Y));
+            controller.UpdateValue(ArduinoController.ArduinoValues.RightYaxis, MapAxisToServo(_selectedController.RightThumbStick.Y));
             //controller.SendData();
         }
     }
