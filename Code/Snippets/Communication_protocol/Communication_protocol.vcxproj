@@ -83,6 +83,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="__vm\.Communication_protocol.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>
@@ -93,7 +94,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties vm.upload.useprogrammer="0" vm.programmer_name="avrisp" arduino.upload.port="COM9" />
+      <UserProperties vm.upload.useprogrammer="0" vm.programmer_name="avrisp" arduino.upload.port="COM7" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

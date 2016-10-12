@@ -125,7 +125,7 @@
             <ProgressBar Grid.Row="9"  Minimum="0" Maximum="255"   Value="{Binding SelectedController.LeftTrigger, Mode=OneWay}" />
 
             <TextBlock Text="Right Trigger" Grid.Row="10" />
-            <ProgressBar Grid.Row="11"  Minimum="0" Maximum="255" Value="{Binding SelectedController.RightTrigger, Mode=OneWay}" />
+            <ProgressBar x:Name="RightTrigger" Grid.Row="11"  Minimum="0" Maximum="255" Value="{Binding SelectedController.RightTrigger, Mode=OneWay}" ValueChanged="RightTrigger_ValueChanged" />
         </Grid>
 
 

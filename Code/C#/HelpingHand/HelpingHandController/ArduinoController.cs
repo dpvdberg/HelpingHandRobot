@@ -28,6 +28,7 @@ namespace HelpingHandController
         {
             RightXaxis = 0,
             RightYaxis = 1,
+            RightTrigger = 2
         }
 
         public void UpdateValue(ArduinoValues argument, int value)
@@ -58,10 +59,11 @@ namespace HelpingHandController
             string data = "";
             foreach (KeyValuePair<int, int> v in valueHolder)
                 data += $"{v.Key}:{v.Value}&";
+            Console.WriteLine(data.Trim('&'));
             return data.Trim('&');
         }
 
-        public void SendData(bool addNewLine = true)
+        public void SendData(bool addNewLine = false)
         {
             try
             {
