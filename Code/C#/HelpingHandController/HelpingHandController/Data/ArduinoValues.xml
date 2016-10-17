@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArduinoDefaultValues>
+  <ArduinoValue name="GimbalYaw">90</ArduinoValue>
+  <ArduinoValue name="GimbalPitch">90</ArduinoValue>
+  <ArduinoValue name="RightMotorPwm">0</ArduinoValue>
+</ArduinoDefaultValues>

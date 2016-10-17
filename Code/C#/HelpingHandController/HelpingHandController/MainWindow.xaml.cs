@@ -25,8 +25,6 @@ namespace HelpingHandController
         ArduinoController controller = new ArduinoController();
         private Timer timer;
 
-        const int MAX_AXIS_VALUE = 32768;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -55,12 +53,6 @@ namespace HelpingHandController
         {
             OnPropertyChanged("SelectedController");
         }
-
-        private int MapAxisToServo(int value)
-        {
-            return (int) (180.0/(2*MAX_AXIS_VALUE)*(-value + MAX_AXIS_VALUE));
-        }
-
         
         public XboxController SelectedController
         {
@@ -118,17 +110,36 @@ namespace HelpingHandController
 
         private void RightXAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.RightXaxis, MapAxisToServo(_selectedController.RightThumbStick.X));
+            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalYaw, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.X));
         }
 
         private void RightYAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.RightYaxis, MapAxisToServo(_selectedController.RightThumbStick.Y));
+            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalPitch, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.Y));
         }
 
         private void RightTrigger_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.RightTrigger, _selectedController.RightTrigger);
+            controller.UpdateMotors(
+                _selectedController.LeftThumbStick.X,
+                _selectedController.LeftThumbStick.Y,
+                _selectedController.RightTrigger);
+        }
+
+        private void LeftXAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            controller.UpdateMotors(
+                _selectedController.LeftThumbStick.X,
+                _selectedController.LeftThumbStick.Y,
+                _selectedController.RightTrigger);
+        }
+
+        private void LeftYAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            controller.UpdateMotors(
+                _selectedController.LeftThumbStick.X,
+                _selectedController.LeftThumbStick.Y,
+                _selectedController.RightTrigger);
         }
     }
 }

@@ -110,10 +110,10 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Left X Axis " Grid.Row="0" />
-            <ProgressBar Grid.Row="1" Minimum="-32768" Maximum="32767"  Value="{Binding SelectedController.LeftThumbStick.X, Mode=OneWay}"  />
+            <ProgressBar x:Name="LeftXAxis" Grid.Row="1" Minimum="-32768" Maximum="32767"  Value="{Binding SelectedController.LeftThumbStick.X, Mode=OneWay}" ValueChanged="LeftXAxis_ValueChanged"  />
 
             <TextBlock Text="Left Y Axis" Grid.Row="2" />
-            <ProgressBar Grid.Row="3"  Minimum="-32768" Maximum="32767"  Value="{Binding SelectedController.LeftThumbStick.Y, Mode=OneWay}" />
+            <ProgressBar x:Name="LeftYAxis" Grid.Row="3"  Minimum="-32768" Maximum="32767"  Value="{Binding SelectedController.LeftThumbStick.Y, Mode=OneWay}" ValueChanged="LeftYAxis_ValueChanged" />
 
             <TextBlock Text="Right X Axis" Grid.Row="4" />
             <ProgressBar x:Name="RightXAxis" Grid.Row="5"  Minimum="-32768" Maximum="32767"  Value="{Binding SelectedController.RightThumbStick.X, Mode=OneWay}" ValueChanged="RightXAxis_ValueChanged"  />

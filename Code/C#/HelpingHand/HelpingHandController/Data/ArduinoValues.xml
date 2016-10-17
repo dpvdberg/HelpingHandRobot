@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ArduinoDefaultValues>
-  <ArduinoValue name="RightXaxis">90</ArduinoValue>
-  <ArduinoValue name="RightYaxis">90</ArduinoValue>
-  <ArduinoValue name="RightTrigger">0</ArduinoValue>
-</ArduinoDefaultValues>
