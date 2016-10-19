@@ -7,28 +7,22 @@
 #include "Constants.h"
 
 // Servo data
-struct Servos servos;
+Servos servos;
 
 // Motor data
-struct Motors motors;
+Motors motors;
 
 // Open the bridge socket 5566 to communicate.
 BridgeServer server(BRIDGE_PORT);
 
-// Saves values for commands
-int savedCommandValues[COMMAND_COUNT];
-
-int motor_inA_Pins[2] = { 7, 4 }; // INA: Clockwise input
-int motor_inB_Pins[2] = { 8, 9 }; // INB: Counter-clockwise input
-int motor_PWM_Pins[2] = { 5, 6 }; // PWM input
-
-								  ///
-								  /// Arduino setup function
-								  ///
+///
+/// Arduino setup function
+///
 void setup() {
 	Bridge.begin();
 	// Setup Console, this is for debug purposes only
 	Console.begin();
+
 	// Wait for Console port to connect
 	while (!Console) {};
 
@@ -36,31 +30,13 @@ void setup() {
 	server.noListenOnLocalhost();
 	server.begin();
 
-	// Attach servos and set default values
-	servos.GimbalPitch.setup(PIN_GIMBAL_PITCH, GIMBAL_PITCH_ANGLE);
-	servos.GimbalYaw.setup(PIN_GIMBAL_YAW, GIMBAL_YAW_ANGLE);
+	// Initialize servos
+	servos.GimbalPitch.initialize(PIN_GIMBAL_PITCH, GIMBAL_PITCH_ANGLE);
+	servos.GimbalYaw.initialize(PIN_GIMBAL_YAW, GIMBAL_YAW_ANGLE);
 
 	// Initialize motors
-	motors.LeftMotor.setup(0);
-	motors.RightMotor.setup(1);
-
-	// Initialize pins for motors
-	for (int i = 0; i < 2; i++)
-	{
-		pinMode(motor_inA_Pins[i], OUTPUT);
-		pinMode(motor_inB_Pins[i], OUTPUT);
-		pinMode(motor_PWM_Pins[i], OUTPUT);
-	}
-	// Initialize motors braked
-	for (int i = 0; i < 2; i++)
-	{
-		digitalWrite(motor_inA_Pins[i], LOW);
-		digitalWrite(motor_inB_Pins[i], LOW);
-	}
-	// Initialize saved command values
-	for (int i = 0; i < COMMAND_COUNT; i++) {
-		savedCommandValues[i] = 0;
-	}
+	motors.LeftMotor.initialize(true, 7, 8, 5);
+	motors.RightMotor.initialize(false, 4, 9, 6);
 
 	Console.println("Setup done");
 }
@@ -142,12 +118,6 @@ void handleCommand(int id, int argument) {
 		sprintf(buffer, "Command: %d, Argument: %d", id, argument);
 		Console.println(buffer);
 	}
-
-	// If command is not changed, skip updating
-	// This prevents 'flickering' of servos
-	if (savedCommandValues[id] == argument)
-		return;
-	savedCommandValues[id] = argument;
 
 	// Switch over commands
 	switch (id) {
