@@ -64,6 +64,11 @@ namespace HelpingHandController
         public ArduinoController()
         {
             SetInitialValues();
+<<<<<<< HEAD
+=======
+            IPAddress[] IPs = Dns.GetHostAddresses("192.168.240.1");
+            socket.Connect(IPs[0], 5566);
+>>>>>>> 1f074f7702d4e704f9355e323394035b9a16bc6c
         }
 
         public enum ArduinoValues
@@ -89,7 +94,11 @@ namespace HelpingHandController
             valueHolder[(int) ArduinoValues.RightMotorPwm] = motorData.RightMotor.Speed;
             valueHolder[(int) ArduinoValues.RightMotorCcw] = motorData.RightMotor.IsCcw ? 2 : 1;
 
+<<<<<<< HEAD
             //Console.WriteLine($"Lpwm: " + (motorData.LeftMotor.IsCcw ? "CCW:" : "CW:") + $"{motorData.LeftMotor.Speed}" + $" Rpwm: " + (motorData.RightMotor.IsCcw ? "CCW:" : "CW:") + $"{motorData.RightMotor.Speed}");
+=======
+            Console.WriteLine($"Lpwm: " + (motorData.LeftMotor.IsCcw ? "CCW:" : "CW:") + $"{motorData.LeftMotor.Speed}" + $" Rpwm: " + (motorData.RightMotor.IsCcw ? "CCW:" : "CW:") + $"{motorData.RightMotor.Speed}");
+>>>>>>> 1f074f7702d4e704f9355e323394035b9a16bc6c
         }
 
         private MotorData GetMotorData(int x, int y, int trigger)
@@ -97,13 +106,23 @@ namespace HelpingHandController
             float xMapped = MapAxisFloat(x);
             float yMapped = MapAxisFloat(y);
 
+<<<<<<< HEAD
             int LMotorPwm = (int) (yMapped * trigger + xMapped / 2 * trigger);
             bool LMotorCcw = LMotorPwm < 0;
-            LMotorPwm = Math.Abs(LMotorPwm) > 255 ? 255 : Math.Abs(LMotorPwm);
             LMotorPwm = Math.Abs(LMotorPwm) > 255 ? 255 : Math.Abs(LMotorPwm);
 
             int RMotorPwm = (int) (yMapped * trigger - xMapped / 2 * trigger);
             bool RMotorCcw = RMotorPwm > 0;
+=======
+            Console.WriteLine($"x: {xMapped}, y: {yMapped}");
+
+            int LMotorPwm = (int) (yMapped * trigger + xMapped / 2 * trigger);
+            bool LMotorCcw = LMotorPwm < 0;
+            LMotorPwm = Math.Abs(LMotorPwm) > 255 ? 255 : Math.Abs(LMotorPwm);
+
+            int RMotorPwm = (int) (yMapped * trigger - xMapped / 2 * trigger);
+            bool RMotorCcw = LMotorPwm > 0;
+>>>>>>> 1f074f7702d4e704f9355e323394035b9a16bc6c
             RMotorPwm = Math.Abs(RMotorPwm) > 255 ? 255 : Math.Abs(RMotorPwm);
 
             return new MotorData(
