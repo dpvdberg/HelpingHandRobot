@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,8 +24,9 @@ namespace HelpingHandController
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        ArduinoController controller = new ArduinoController();
-        private Timer timer;
+        private ArduinoController controller = new ArduinoController();
+        private Config config = new Config();
+        private System.Timers.Timer timer;
 
         public MainWindow()
         {
@@ -32,10 +35,12 @@ namespace HelpingHandController
             _selectedController = XboxController.RetrieveController(0);
             _selectedController.StateChanged += _selectedController_StateChanged;
             XboxController.StartPolling();
-            timer = new Timer();
+            timer = new System.Timers.Timer();
             timer.Interval = 15;
             timer.Elapsed += timer_Elapsed;
-            timer.Start(); 
+            timer.Start();
+
+            SetupSweepTimers();
         }
 
         private void timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -53,17 +58,19 @@ namespace HelpingHandController
         {
             OnPropertyChanged("SelectedController");
         }
-        
+
+        XboxController _selectedController;
         public XboxController SelectedController
         {
-
             get { return _selectedController; }
         }
-
+        
+        public ArduinoController AC
+        {
+            get { return controller; }
+        }
 
         volatile bool _keepRunning;
-        XboxController _selectedController;
-
 
         public void OnPropertyChanged(string name)
         {
@@ -141,5 +148,76 @@ namespace HelpingHandController
                 _selectedController.LeftThumbStick.Y,
                 _selectedController.RightTrigger);
         }
+
+        private void NumericTextBox(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !IsTextAllowed(e.Text);
+        }
+
+        private bool IsTextAllowed(string text)
+        {
+            Regex regex = new Regex("[^0-9.-]+");
+            return !regex.IsMatch(text);
+        }
+
+        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        {
+            controller.Connect(txtArduinoIP.Text, int.Parse(txtArduinoPort.Text));
+            btnConnect.Content = txtArduinoStatus.Text == "Connected" ? "Disconnect" : "Connect";
+        }
+
+        #region ArmControl 
+        private void SweepStart(System.Timers.Timer sweeper, CheckBox chk)
+        {
+            new Thread(() =>
+            {
+                Thread.Sleep(Config.InitializeSweeperDelay);
+                Dispatcher.Invoke(() =>
+                {
+                    if ((bool)chk.IsChecked)
+                        sweeper.Start();
+                });
+            }).Start();
+        }
+
+        System.Timers.Timer RightShoulderSweeper = new System.Timers.Timer(Config.ArmSweepDelay);
+        bool RightShoulderSweepPositive;
+        private void SetupSweepTimers()
+        {
+            RightShoulderSweeper.Elapsed += RightShoulderSweeper_Elapsed;
+        }
+
+        private void RightShoulderSweeper_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            controller.UpdateValue(
+                ArduinoController.ArduinoValues.ArmRotator,
+                RightShoulderSweepPositive ? config.ArmRotatorAngleAdjustment : -config.ArmRotatorAngleAdjustment,
+                true, true);
+        }
+
+        private void CheckboxRightShoulderButton_Checked(object sender, RoutedEventArgs e)
+        {
+            RightShoulderSweepPositive = true;
+            SweepStart(RightShoulderSweeper, CheckboxRightShoulderButton);
+            controller.UpdateValue(ArduinoController.ArduinoValues.ArmRotator, config.ArmRotatorAngleAdjustment, true, true);
+        }
+
+        private void CheckboxRightShoulderButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            RightShoulderSweeper.Stop();
+        }
+
+        private void CheckboxLeftShoulderButton_Checked(object sender, RoutedEventArgs e)
+        {
+            RightShoulderSweepPositive = false;
+            SweepStart(RightShoulderSweeper, CheckboxLeftShoulderButton);
+            controller.UpdateValue(ArduinoController.ArduinoValues.ArmRotator, -config.ArmRotatorAngleAdjustment, true, true);
+        }
+
+        private void CheckboxLeftStickButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            RightShoulderSweeper.Stop();
+        }
+        #endregion
     }
 }

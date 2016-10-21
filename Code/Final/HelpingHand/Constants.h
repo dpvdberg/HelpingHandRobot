@@ -35,7 +35,3 @@
 // Pins
 #define PIN_GIMBAL_YAW A0
 #define PIN_GIMBAL_PITCH A1
-
-extern int motor_inA_Pins[2]; // INA: Clockwise input
-extern int motor_inB_Pins[2]; // INB: Counter-clockwise input
-extern int motor_PWM_Pins[2]; // PWM input

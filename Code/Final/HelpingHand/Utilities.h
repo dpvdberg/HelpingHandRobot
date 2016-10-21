@@ -5,60 +5,65 @@
 * Helping hand Utilities
 ************************/
 
-extern void driveMotor(int motor, int direct, int pwm);
+class ServoData {
+	int _currentPos;
+	int _pin;
+	public:
+		Servo servo;
 
-struct ServoData {
-	int currentPos;
-	Servo servo;
-	void setup(int pin, int angle) {
-		servo.attach(pin);
-		setAngle(angle);
-	}
-	void setAngle(int angle)
-	{
-		if (currentPos == angle)
-			return;
-		servo.write(angle);
-		currentPos = angle;
-	}
+		void initialize(int pin, int angle) {
+			servo.attach(pin);
+			setAngle(angle);
+
+			_pin = pin;
+			_currentPos = angle;
+		}
+
+		void setAngle(int angle)
+		{
+			if (_currentPos == angle)
+				return;
+			servo.write(angle);
+			_currentPos = angle;
+		}
 };
 
-struct MotorData {
-	int motorId;
-	int speed;
-	int isCcw;
+class MotorData {
+	bool _isLeft;
+	int getMotorId() { return _isLeft ? 0 : 1; };
+	public:
+		int pin_inA;
+		int pin_inB;
+		int pin_pwm;
+		int speed;
+		int isCcw;
 
-	void setup(int id) {
-		motorId = id;
-		speed = 0;
-		isCcw = 0;
-	}
+		void initialize(bool isLeft, int inApin, int inBpin, int pwmPin) {
+			_isLeft = isLeft;
+			pin_inA = inApin;
+			pin_inB = inBpin;
+			pin_pwm = pwmPin;
 
-	void setSpeed(int pwm) {
-		if (speed == pwm)
-			return;
-		driveMotor(motorId, isCcw == 1 ? 2 : 1, pwm);
-		speed = pwm;
-	}
+			// Initialize pins
+			digitalWrite(pin_inA, OUTPUT);
+			digitalWrite(pin_inB, OUTPUT);
+			digitalWrite(pin_pwm, OUTPUT);
 
-	void setDirection(int ccw) {
-		if (isCcw == ccw)
-			return;
-		driveMotor(motorId, ccw == 1 ? 2 : 1, speed);
-		isCcw = ccw;
-	}
+			// Set motors braked
+			brake(0);
+		}
 
-	void brake(int vcc) {
-		driveMotor(motorId, vcc == 1 ? 0 : 3, speed);
-	}
+		void setSpeed(int pwm);
+		void setDirection(int ccw);
+		void brake(int vcc);
 };
 
 struct Servos {
-	struct ServoData GimbalYaw;
-	struct ServoData GimbalPitch;
+	ServoData GimbalYaw;
+	ServoData GimbalPitch;
 };
 
 struct Motors {
-	struct MotorData LeftMotor;
-	struct MotorData RightMotor;
+	MotorData LeftMotor;
+	MotorData RightMotor;
 };

@@ -1,6 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ArduinoDefaultValues>
-  <ArduinoValue name="GimbalYaw">90</ArduinoValue>
-  <ArduinoValue name="GimbalPitch">90</ArduinoValue>
-  <ArduinoValue name="RightMotorPwm">0</ArduinoValue>
-</ArduinoDefaultValues>
+<values>
+  <ArduinoDefaultValues>
+    <ArduinoValue name="GimbalYaw">90</ArduinoValue>
+    <ArduinoValue name="GimbalPitch">90</ArduinoValue>
+    <ArduinoValue name="LeftMotorPwm">0</ArduinoValue>
+    <ArduinoValue name="RightMotorPwm">0</ArduinoValue>
+    <ArduinoValue name="LeftMotorCcw">0</ArduinoValue>
+    <ArduinoValue name="RightMotorCcw">0</ArduinoValue>
+    <ArduinoValue name="ArmRotator">90</ArduinoValue>
+    <ArduinoValue name="ArmShoulder">90</ArduinoValue>
+    <ArduinoValue name="ArmElbow">90</ArduinoValue>
+    <ArduinoValue name="ArmWrist">90</ArduinoValue>
+    <ArduinoValue name="ArmGrabber">90</ArduinoValue>
+  </ArduinoDefaultValues>
+  <ArduinoArmValues>
+    <ArduinoValue name="ArmRotatorAngleAdjustment">2</ArduinoValue>
+    <ArduinoValue name="ArmShoulderAngleAdjustment">3</ArduinoValue>
+    <ArduinoValue name="ArmElbowAngleAdjustment">3</ArduinoValue>
+    <ArduinoValue name="ArmWristAngleAdjustment">3</ArduinoValue>
+    <ArduinoValue name="ArmGrabberAngleAdjustment">3</ArduinoValue>
+  </ArduinoArmValues>
+</values>

@@ -11,22 +11,40 @@
 ///
 /// pwm: Should be in the interval [0,255]
 ///
-void driveMotor(int motor, int setting, int pwm)
+void driveMotor(MotorData &motor, int setting)
 {
-	if (motor <= 1 && setting <= 4)
+	if (setting <= 4)
 	{
 		// Set inA[motor]
 		if (setting <= 1)
-			digitalWrite(motor_inA_Pins[motor], HIGH);
+			digitalWrite(motor.pin_inA, HIGH);
 		else
-			digitalWrite(motor_inA_Pins[motor], LOW);
+			digitalWrite(motor.pin_inA, LOW);
 
 		// Set inB[motor]
 		if ((setting == 0) || (setting == 2))
-			digitalWrite(motor_inB_Pins[motor], HIGH);
+			digitalWrite(motor.pin_inB, HIGH);
 		else
-			digitalWrite(motor_inB_Pins[motor], LOW);
+			digitalWrite(motor.pin_inB, LOW);
 
-		analogWrite(motor_PWM_Pins[motor], pwm);
+		analogWrite(motor.pin_pwm, motor.speed);
 	}
+}
+
+void MotorData::setDirection(int ccw) {
+	if (isCcw == ccw)
+		return;
+	driveMotor(*this, ccw == 1 ? 2 : 1);
+	isCcw = ccw;
+}
+
+void MotorData::brake(int vcc) {
+	driveMotor(*this, vcc == 1 ? 0 : 3);
+}
+
+void MotorData::setSpeed(int pwm) {
+	if (speed == pwm)
+		return;
+	driveMotor(*this, isCcw == 1 ? 2 : 1);
+	speed = pwm;
 }
