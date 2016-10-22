@@ -61,6 +61,11 @@ class MotorData {
 struct Servos {
 	ServoData GimbalYaw;
 	ServoData GimbalPitch;
+	ServoData ArmRotator;
+	ServoData ArmShoulder;
+	ServoData ArmElbow;
+	ServoData ArmWrist;
+	ServoData ArmGrabber;
 };
 
 struct Motors {

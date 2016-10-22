@@ -133,6 +133,15 @@ namespace HelpingHandController
             }
         }
 
+        public void SetArmMode(ArmMode mode)
+        {
+            valueHolder[(int)ArduinoValues.ArmRotator] = mode.RotatorAngle;
+            valueHolder[(int)ArduinoValues.ArmShoulder] = mode.ShoulderAngle;
+            valueHolder[(int)ArduinoValues.ArmElbow] = mode.ElbowAngle;
+            valueHolder[(int)ArduinoValues.ArmWrist] = mode.WristAngle;
+            valueHolder[(int)ArduinoValues.ArmGrabber] = mode.GrabberAngle;
+        }
+
         /// <summary>
         /// Encodes data to readable format for arduino
         /// </summary>

@@ -33,10 +33,21 @@ void setup() {
 	// Initialize servos
 	servos.GimbalPitch.initialize(PIN_GIMBAL_PITCH, GIMBAL_PITCH_ANGLE);
 	servos.GimbalYaw.initialize(PIN_GIMBAL_YAW, GIMBAL_YAW_ANGLE);
+	servos.ArmRotator.initialize(PIN_ARM_ROTATOR, ARM_ROTATOR_ANGLE);
+	servos.ArmShoulder.initialize(PIN_ARM_SHOULDER, ARM_SHOULDER_ANGLE);
+	servos.ArmElbow.initialize(PIN_ARM_ELBOW, ARM_ELBOW_ANGLE);
+	servos.ArmWrist.initialize(PIN_ARM_WRIST, ARM_WRIST_ANGLE);
+	servos.ArmGrabber.initialize(PIN_ARM_GRABBER, ARM_GRABBER_ANGLE);
 
 	// Initialize motors
-	motors.LeftMotor.initialize(true, 7, 8, 5);
-	motors.RightMotor.initialize(false, 4, 9, 6);
+	motors.LeftMotor.initialize(true,
+		PIN_LMOTOR_INA,
+		PIN_LMOTOR_INB,
+		PIN_LMOTOR_PWM);
+	motors.RightMotor.initialize(false,
+		PIN_RMOTOR_INA,
+		PIN_RMOTOR_INB,
+		PIN_RMOTOR_PWM);
 
 	Console.println("Setup done");
 }
@@ -138,6 +149,21 @@ void handleCommand(int id, int argument) {
 		break;
 	case CMD_RMOTOR_DIRECTION:
 		motors.RightMotor.setDirection(argument);
+		break;
+	case CMD_ARM_ROTATOR:
+		servos.ArmRotator.setAngle(argument);
+		break;
+	case CMD_ARM_SHOULDER:
+		servos.ArmShoulder.setAngle(argument);
+		break;
+	case CMD_ARM_ELBOW:
+		servos.ArmElbow.setAngle(argument);
+		break;
+	case CMD_ARM_WRIST:
+		servos.ArmWrist.setAngle(argument);
+		break;
+	case CMD_ARM_GRABBER:
+		servos.ArmGrabber.setAngle(argument);
 		break;
 	}
 }

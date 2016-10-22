@@ -40,7 +40,7 @@ namespace HelpingHandController
             timer.Elapsed += timer_Elapsed;
             timer.Start();
 
-            SetupSweepTimers();
+            SetupSweepers();
         }
 
         private void timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -69,8 +69,6 @@ namespace HelpingHandController
         {
             get { return controller; }
         }
-
-        volatile bool _keepRunning;
 
         public void OnPropertyChanged(string name)
         {
@@ -167,56 +165,160 @@ namespace HelpingHandController
         }
 
         #region ArmControl 
-        private void SweepStart(System.Timers.Timer sweeper, CheckBox chk)
+        public class Sweeper
         {
-            new Thread(() =>
+            private Config config = new Config();
+            private ArduinoController.ArduinoValues _arduinoValue;
+            private bool IsSweepPositive;
+            private CheckBox _positive;
+            private CheckBox _negative;
+            private MainWindow _window;
+            private ArduinoController _controller;
+            private System.Timers.Timer timer;
+            private int angle;
+            public Sweeper(ArduinoController.ArduinoValues ArduinoValue,
+                ref CheckBox SweepPositive,
+                ref CheckBox SweepNegative,
+                ref ArduinoController controller,
+                int SweepAngle)
             {
-                Thread.Sleep(Config.InitializeSweeperDelay);
-                Dispatcher.Invoke(() =>
+                _arduinoValue = ArduinoValue;
+                _positive = SweepPositive;
+                _negative = SweepNegative;
+                _controller = controller;
+                _window = (MainWindow)Application.Current.MainWindow;
+                timer = new System.Timers.Timer(config.SweepDelay);
+                angle = SweepAngle;
+
+                SetSweepers();
+            }
+
+            private void SetSweepers()
+            {
+                timer.Elapsed += TimerElapsed;
+
+                _positive.Checked += CheckChanged;
+                _positive.Unchecked += CheckChanged;
+
+                _negative.Checked += CheckChanged;
+                _negative.Unchecked += CheckChanged;
+            }
+
+            private void TimerElapsed(object sender, ElapsedEventArgs e)
+            {
+                _controller.UpdateValue(_arduinoValue, IsSweepPositive ? angle : -angle, true, true);
+            }
+
+            private void CheckChanged(object sender, RoutedEventArgs e)
+            {
+                CheckBox currentCheckbox = (CheckBox)sender;
+                IsSweepPositive = currentCheckbox == _positive;
+
+                new Thread(() => {
+                    _window.Dispatcher.Invoke(() => InitializeSweep(currentCheckbox));
+                }).Start();
+            }
+
+            private void InitializeSweep(CheckBox CurrentCheckbox)
+            {
+                if ((bool)CurrentCheckbox.IsChecked)
                 {
-                    if ((bool)chk.IsChecked)
-                        sweeper.Start();
-                });
-            }).Start();
+                    _controller.UpdateValue(_arduinoValue, IsSweepPositive ? angle : -angle, true, true);
+                    Thread.Sleep(Config.InitializeSweeperDelay);
+                    if ((bool)CurrentCheckbox.IsChecked)
+                        timer.Start();
+                }
+                else
+                {
+                    timer.Stop();
+                }
+            }
         }
-
-        System.Timers.Timer RightShoulderSweeper = new System.Timers.Timer(Config.ArmSweepDelay);
-        bool RightShoulderSweepPositive;
-        private void SetupSweepTimers()
+        
+        private void SetupSweepers()
         {
-            RightShoulderSweeper.Elapsed += RightShoulderSweeper_Elapsed;
-        }
-
-        private void RightShoulderSweeper_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            controller.UpdateValue(
+            new Sweeper(
                 ArduinoController.ArduinoValues.ArmRotator,
-                RightShoulderSweepPositive ? config.ArmRotatorAngleAdjustment : -config.ArmRotatorAngleAdjustment,
-                true, true);
+                ref CheckboxDPadRightButton,
+                ref CheckboxDPadLeftButton,
+                ref controller,
+                config.ArmRotatorAngleAdjustment);
+
+            new Sweeper(
+                ArduinoController.ArduinoValues.ArmShoulder,
+                ref CheckboxDPadUpButton,
+                ref CheckboxDPadDownButton,
+                ref controller,
+                config.ArmShoulderAngleAdjustment);
+
+            new Sweeper(
+                ArduinoController.ArduinoValues.ArmElbow,
+                ref CheckboxRightShoulderButton,
+                ref CheckboxLeftShoulderButton,
+                ref controller,
+                config.ArmShoulderAngleAdjustment);
+
+            new Sweeper(
+                ArduinoController.ArduinoValues.ArmWrist,
+                ref CheckboxStartButton,
+                ref CheckboxBackButton,
+                ref controller,
+                config.ArmWristAngleAdjustment);
+
+            new Sweeper(
+                ArduinoController.ArduinoValues.ArmGrabber,
+                ref CheckboxAButton,
+                ref CheckboxBButton,
+                ref controller,
+                config.ArmGrabberAngleAdjustment);
         }
 
-        private void CheckboxRightShoulderButton_Checked(object sender, RoutedEventArgs e)
+        private bool Ydouble = false;
+        /// <summary>
+        /// Double tap sets arm to specific mode
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckboxYButton_Checked(object sender, RoutedEventArgs e)
         {
-            RightShoulderSweepPositive = true;
-            SweepStart(RightShoulderSweeper, CheckboxRightShoulderButton);
-            controller.UpdateValue(ArduinoController.ArduinoValues.ArmRotator, config.ArmRotatorAngleAdjustment, true, true);
+            if (Ydouble)
+            {
+                Ydouble = false;
+                controller.SetArmMode(config.ArmModes["Tower"]);
+            }
+            else
+            {
+                Ydouble = true;
+                new Thread(() =>
+                {
+                    Thread.Sleep(500);
+                    Ydouble = false;
+                }).Start();
+            }
         }
 
-        private void CheckboxRightShoulderButton_Unchecked(object sender, RoutedEventArgs e)
+        private bool Xdouble = false;
+        /// <summary>
+        /// Double tap sets arm to specific mode
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckboxXButton_Checked(object sender, RoutedEventArgs e)
         {
-            RightShoulderSweeper.Stop();
-        }
-
-        private void CheckboxLeftShoulderButton_Checked(object sender, RoutedEventArgs e)
-        {
-            RightShoulderSweepPositive = false;
-            SweepStart(RightShoulderSweeper, CheckboxLeftShoulderButton);
-            controller.UpdateValue(ArduinoController.ArduinoValues.ArmRotator, -config.ArmRotatorAngleAdjustment, true, true);
-        }
-
-        private void CheckboxLeftStickButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            RightShoulderSweeper.Stop();
+            if (Xdouble)
+            {
+                Xdouble = false;
+                controller.SetArmMode(config.ArmModes["Low"]);
+            }
+            else
+            {
+                Xdouble = true;
+                new Thread(() =>
+                {
+                    Thread.Sleep(500);
+                    Xdouble = false;
+                }).Start();
+            }
         }
         #endregion
     }

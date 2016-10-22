@@ -19,5 +19,22 @@
     <ArduinoValue name="ArmElbowAngleAdjustment">3</ArduinoValue>
     <ArduinoValue name="ArmWristAngleAdjustment">3</ArduinoValue>
     <ArduinoValue name="ArmGrabberAngleAdjustment">3</ArduinoValue>
+    <ArduinoValue name="SweepDelay">100</ArduinoValue>
+    <Modes>
+      <Tower>
+        <ArduinoValue name="ArmRotator">90</ArduinoValue>
+        <ArduinoValue name="ArmShoulder">90</ArduinoValue>
+        <ArduinoValue name="ArmElbow">90</ArduinoValue>
+        <ArduinoValue name="ArmWrist">0</ArduinoValue>
+        <ArduinoValue name="ArmGrabber">0</ArduinoValue>
+      </Tower>
+      <Low>
+        <ArduinoValue name="ArmRotator">90</ArduinoValue>
+        <ArduinoValue name="ArmShoulder">0</ArduinoValue>
+        <ArduinoValue name="ArmElbow">90</ArduinoValue>
+        <ArduinoValue name="ArmWrist">90</ArduinoValue>
+        <ArduinoValue name="ArmGrabber">0</ArduinoValue>
+      </Low>
+    </Modes>
   </ArduinoArmValues>
 </values>
