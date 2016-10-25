@@ -24,9 +24,9 @@ namespace HelpingHandController
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private ArduinoController controller = new ArduinoController();
-        private Config config = new Config();
-        private System.Timers.Timer timer;
+        private ArduinoController Controller = new ArduinoController();
+        private Config Config = new Config();
+        private System.Timers.Timer ArduinoTimer;
 
         public MainWindow()
         {
@@ -35,17 +35,28 @@ namespace HelpingHandController
             _selectedController = XboxController.RetrieveController(0);
             _selectedController.StateChanged += _selectedController_StateChanged;
             XboxController.StartPolling();
-            timer = new System.Timers.Timer();
-            timer.Interval = 15;
-            timer.Elapsed += timer_Elapsed;
-            timer.Start();
+            ArduinoTimer = new System.Timers.Timer();
+            ArduinoTimer.Interval = Config.DataSendDelay;
+            ArduinoTimer.Elapsed += ArduinoTimer_Elapsed;
+            ArduinoTimer.Start();
+
+            System.Timers.Timer DebugTimer = new System.Timers.Timer();
+            DebugTimer.Interval = 200;
+            DebugTimer.Elapsed += DebugTimer_Elapsed;
+            DebugTimer.Start();
 
             SetupSweepers();
         }
 
-        private void timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void ArduinoTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            controller.SendData();
+            Controller.SetMotorValues();
+            Controller.SendData();
+        }
+
+        private void DebugTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Console.WriteLine(Controller.GetDataString());
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -67,7 +78,7 @@ namespace HelpingHandController
         
         public ArduinoController AC
         {
-            get { return controller; }
+            get { return Controller; }
         }
 
         public void OnPropertyChanged(string name)
@@ -93,39 +104,19 @@ namespace HelpingHandController
             _selectedController.Vibrate(leftMotorSpeed, rightMotorSpeed, TimeSpan.FromSeconds(2));
         }
 
-        private void CheckboxDPadDownButton_Checked(object sender, RoutedEventArgs e)
-        {
-            controller.SendData();
-        }
-
-        private void CheckboxDPadUpButton_Checked(object sender, RoutedEventArgs e)
-        {
-            //controller.SendData(1001);
-        }
-
-        private void CheckboxDPadRightButton_Checked(object sender, RoutedEventArgs e)
-        {
-            //controller.SendData(1004);
-        }
-
-        private void CheckboxDPadLeftButton_Checked(object sender, RoutedEventArgs e)
-        {
-            //controller.SendData(1002);
-        }
-
         private void RightXAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalYaw, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.X));
+            Controller.UpdateValue(ArduinoController.ArduinoValues.GimbalYaw, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.X));
         }
 
         private void RightYAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateValue(ArduinoController.ArduinoValues.GimbalPitch, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.Y));
+            Controller.UpdateValue(ArduinoController.ArduinoValues.GimbalPitch, ArduinoController.MapAxisToServo(_selectedController.RightThumbStick.Y));
         }
 
         private void RightTrigger_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateMotors(
+            Controller.UpdateMotors(
                 _selectedController.LeftThumbStick.X,
                 _selectedController.LeftThumbStick.Y,
                 _selectedController.RightTrigger);
@@ -133,7 +124,7 @@ namespace HelpingHandController
 
         private void LeftXAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateMotors(
+            Controller.UpdateMotors(
                 _selectedController.LeftThumbStick.X,
                 _selectedController.LeftThumbStick.Y,
                 _selectedController.RightTrigger);
@@ -141,7 +132,7 @@ namespace HelpingHandController
 
         private void LeftYAxis_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            controller.UpdateMotors(
+            Controller.UpdateMotors(
                 _selectedController.LeftThumbStick.X,
                 _selectedController.LeftThumbStick.Y,
                 _selectedController.RightTrigger);
@@ -160,22 +151,22 @@ namespace HelpingHandController
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            controller.Connect(txtArduinoIP.Text, int.Parse(txtArduinoPort.Text));
-            btnConnect.Content = txtArduinoStatus.Text == "Connected" ? "Disconnect" : "Connect";
+            Controller.Connect(txtArduinoIP.Text, int.Parse(txtArduinoPort.Text));
+            btnConnect.Content = Controller.Socket.Connected ? "Disconnect" : "Connect";
         }
 
         #region ArmControl 
         public class Sweeper
         {
-            private Config config = new Config();
+            private Config Config = new Config();
             private ArduinoController.ArduinoValues _arduinoValue;
             private bool IsSweepPositive;
             private CheckBox _positive;
             private CheckBox _negative;
             private MainWindow _window;
             private ArduinoController _controller;
-            private System.Timers.Timer timer;
-            private int angle;
+            private System.Timers.Timer Timer;
+            private int Angle;
             public Sweeper(ArduinoController.ArduinoValues ArduinoValue,
                 ref CheckBox SweepPositive,
                 ref CheckBox SweepNegative,
@@ -187,15 +178,15 @@ namespace HelpingHandController
                 _negative = SweepNegative;
                 _controller = controller;
                 _window = (MainWindow)Application.Current.MainWindow;
-                timer = new System.Timers.Timer(config.SweepDelay);
-                angle = SweepAngle;
+                Timer = new System.Timers.Timer(Config.SweepDelay);
+                Angle = SweepAngle;
 
                 SetSweepers();
             }
 
             private void SetSweepers()
             {
-                timer.Elapsed += TimerElapsed;
+                Timer.Elapsed += TimerElapsed;
 
                 _positive.Checked += CheckChanged;
                 _positive.Unchecked += CheckChanged;
@@ -206,7 +197,7 @@ namespace HelpingHandController
 
             private void TimerElapsed(object sender, ElapsedEventArgs e)
             {
-                _controller.UpdateValue(_arduinoValue, IsSweepPositive ? angle : -angle, true, true);
+                _controller.UpdateValue(_arduinoValue, IsSweepPositive ? Angle : -Angle, true, true);
             }
 
             private void CheckChanged(object sender, RoutedEventArgs e)
@@ -223,14 +214,14 @@ namespace HelpingHandController
             {
                 if ((bool)CurrentCheckbox.IsChecked)
                 {
-                    _controller.UpdateValue(_arduinoValue, IsSweepPositive ? angle : -angle, true, true);
+                    _controller.UpdateValue(_arduinoValue, IsSweepPositive ? Angle : -Angle, true, true);
                     Thread.Sleep(Config.InitializeSweeperDelay);
                     if ((bool)CurrentCheckbox.IsChecked)
-                        timer.Start();
+                        Timer.Start();
                 }
                 else
                 {
-                    timer.Stop();
+                    Timer.Stop();
                 }
             }
         }
@@ -241,36 +232,36 @@ namespace HelpingHandController
                 ArduinoController.ArduinoValues.ArmRotator,
                 ref CheckboxDPadRightButton,
                 ref CheckboxDPadLeftButton,
-                ref controller,
-                config.ArmRotatorAngleAdjustment);
+                ref Controller,
+                Config.ArmRotatorAngleAdjustment);
 
             new Sweeper(
                 ArduinoController.ArduinoValues.ArmShoulder,
                 ref CheckboxDPadUpButton,
                 ref CheckboxDPadDownButton,
-                ref controller,
-                config.ArmShoulderAngleAdjustment);
+                ref Controller,
+                Config.ArmShoulderAngleAdjustment);
 
             new Sweeper(
                 ArduinoController.ArduinoValues.ArmElbow,
                 ref CheckboxRightShoulderButton,
                 ref CheckboxLeftShoulderButton,
-                ref controller,
-                config.ArmShoulderAngleAdjustment);
+                ref Controller,
+                Config.ArmShoulderAngleAdjustment);
 
             new Sweeper(
                 ArduinoController.ArduinoValues.ArmWrist,
                 ref CheckboxStartButton,
                 ref CheckboxBackButton,
-                ref controller,
-                config.ArmWristAngleAdjustment);
+                ref Controller,
+                Config.ArmWristAngleAdjustment);
 
             new Sweeper(
                 ArduinoController.ArduinoValues.ArmGrabber,
                 ref CheckboxAButton,
                 ref CheckboxBButton,
-                ref controller,
-                config.ArmGrabberAngleAdjustment);
+                ref Controller,
+                Config.ArmGrabberAngleAdjustment);
         }
 
         private bool Ydouble = false;
@@ -284,7 +275,7 @@ namespace HelpingHandController
             if (Ydouble)
             {
                 Ydouble = false;
-                controller.SetArmMode(config.ArmModes["Tower"]);
+                Controller.SetArmMode(Config.ArmModes["Tower"]);
             }
             else
             {
@@ -308,7 +299,7 @@ namespace HelpingHandController
             if (Xdouble)
             {
                 Xdouble = false;
-                controller.SetArmMode(config.ArmModes["Low"]);
+                Controller.SetArmMode(Config.ArmModes["Low"]);
             }
             else
             {

@@ -46,6 +46,10 @@ namespace HelpingHandController
         public int ArmWristAngleAdjustment { get; set; }
         public int ArmGrabberAngleAdjustment { get; set; }
         public int SweepDelay { get; set; }
+        public int ModeTransitionDuration { get; set; }
+        public int ModeTransitionDelay { get; set; }
+        public int MaxPWMChangePerKnock { get; set; }
+        public int DataSendDelay { get; set; }
 
         public Dictionary<string, ArmMode> ArmModes = new Dictionary<string, ArmMode>();
 
@@ -53,13 +57,12 @@ namespace HelpingHandController
         {
             XDocument xml = XDocument.Load(@"Data\ArduinoValues.xml");
 
-            Console.WriteLine(typeof(Config).GetProperties());
-
+            // Read constants
             List<XElement> elements = xml.Root.Element("ArduinoArmValues").Elements("ArduinoValue").ToList();
-            
             foreach (XElement element in elements)
                 GetType().GetProperty(element.Attribute("name").Value).SetValue(this, int.Parse(element.Value));
 
+            // Read modes
             List<XElement> modes = xml.Root.Element("ArduinoArmValues").Element("Modes").Elements().ToList();
             foreach (XElement mode in modes)
             {
@@ -72,7 +75,6 @@ namespace HelpingHandController
                     armValues["ArmElbow"],
                     armValues["ArmWrist"],
                     armValues["ArmGrabber"]));
-
             }
         }
     }

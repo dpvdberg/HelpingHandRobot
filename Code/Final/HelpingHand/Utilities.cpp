@@ -13,6 +13,17 @@
 ///
 void driveMotor(MotorData &motor, int setting)
 {
+	/*
+	Console.println("Writing motor data.. ");
+	Console.print(motor.pin_inA);
+	Console.print(" and ");
+	Console.print(motor.pin_inB);
+	Console.print(" at ");
+	Console.print(motor.pin_pwm);
+	Console.print(" speed ");
+	Console.print(motor.speed);
+	Console.print("\n");
+	*/
 	if (setting <= 4)
 	{
 		// Set inA[motor]
@@ -31,6 +42,7 @@ void driveMotor(MotorData &motor, int setting)
 	}
 }
 
+
 void MotorData::setDirection(int ccw) {
 	if (isCcw == ccw)
 		return;
@@ -38,8 +50,8 @@ void MotorData::setDirection(int ccw) {
 	isCcw = ccw;
 }
 
-void MotorData::brake(int vcc) {
-	driveMotor(*this, vcc == 1 ? 0 : 3);
+void MotorData::brake(bool vcc) {
+	driveMotor(*this, vcc ? 0 : 3);
 }
 
 void MotorData::setSpeed(int pwm) {

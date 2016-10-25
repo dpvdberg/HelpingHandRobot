@@ -84,13 +84,10 @@ void loop() {
 			{
 				delay(DELAY_NO_DATA);
 				clientAlivePingCounter++;
-				if (clientAlivePingCounter > 1000 / DELAY_NO_DATA) {
+				if (clientAlivePingCounter > DELAY_CHECK_CLIENT_ALIVE / DELAY_NO_DATA && !client.connected()) {
 					// Check if client is still alive
-					Console.println("No data available, checking if client is alive..");
-					if (!client.connected()) {
-						clientStop = true;
-						break;
-					}
+					clientStop = true;
+					break;
 				}
 			}
 
@@ -111,10 +108,11 @@ void loop() {
 			}
 			delay(DELAY_DATA_LOOP);
 		}
+
+		Console.println("Exiting client..");
 		client.stop();
 
 		digitalWrite(13, HIGH);
-		Console.println("Exiting client..");
 	}
 	delay(DELAY_CLIENT_CHECK_LOOP);
 }

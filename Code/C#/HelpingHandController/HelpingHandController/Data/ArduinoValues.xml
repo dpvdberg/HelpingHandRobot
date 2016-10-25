@@ -13,6 +13,7 @@
     <ArduinoValue name="ArmWrist">90</ArduinoValue>
     <ArduinoValue name="ArmGrabber">90</ArduinoValue>
   </ArduinoDefaultValues>
+  
   <ArduinoArmValues>
     <ArduinoValue name="ArmRotatorAngleAdjustment">2</ArduinoValue>
     <ArduinoValue name="ArmShoulderAngleAdjustment">3</ArduinoValue>
@@ -20,6 +21,10 @@
     <ArduinoValue name="ArmWristAngleAdjustment">3</ArduinoValue>
     <ArduinoValue name="ArmGrabberAngleAdjustment">3</ArduinoValue>
     <ArduinoValue name="SweepDelay">100</ArduinoValue>
+    <ArduinoValue name="ModeTransitionDuration">3000</ArduinoValue>
+    <ArduinoValue name="ModeTransitionDelay">10</ArduinoValue>
+    <ArduinoValue name="MaxPWMChangePerKnock">6</ArduinoValue>
+    <ArduinoValue name="DataSendDelay">20</ArduinoValue>
     <Modes>
       <Tower>
         <ArduinoValue name="ArmRotator">90</ArduinoValue>

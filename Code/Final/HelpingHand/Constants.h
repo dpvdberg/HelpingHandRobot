@@ -8,9 +8,9 @@
 #define DELAY_NO_DATA 2
 #define DELAY_DATA_LOOP 10
 #define DELAY_CLIENT_CHECK_LOOP 500
+#define DELAY_CHECK_CLIENT_ALIVE 2000
 
 // Command encodings
-#define COMMAND_COUNT 3
 #define CMD_GIMBAL_YAW 0
 #define CMD_GIMBAL_PITCH 1
 #define CMD_LMOTOR_PWM 2

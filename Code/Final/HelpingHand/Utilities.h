@@ -5,6 +5,9 @@
 * Helping hand Utilities
 ************************/
 
+///
+///	Holds data for servos
+///
 class ServoData {
 	int _currentPos;
 	int _pin;
@@ -28,6 +31,9 @@ class ServoData {
 		}
 };
 
+///
+///	Holds data for motors
+///
 class MotorData {
 	bool _isLeft;
 	int getMotorId() { return _isLeft ? 0 : 1; };
@@ -49,13 +55,13 @@ class MotorData {
 			digitalWrite(pin_inB, OUTPUT);
 			digitalWrite(pin_pwm, OUTPUT);
 
-			// Set motors braked
-			brake(0);
+			// Set motors braked to GND
+			brake(false);
 		}
 
 		void setSpeed(int pwm);
 		void setDirection(int ccw);
-		void brake(int vcc);
+		void brake(bool vcc);
 };
 
 struct Servos {
@@ -72,3 +78,5 @@ struct Motors {
 	MotorData LeftMotor;
 	MotorData RightMotor;
 };
+
+void driveMotor(MotorData &motor, int setting);
